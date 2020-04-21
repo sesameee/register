@@ -1,5 +1,5 @@
 <template>
-  <div id="app-register">
+  <div id="app-register" class="bg" :style="{ display }">
     <section
       class="tip"
       id="tip"
@@ -11,8 +11,6 @@
       class="register-section"
       id="register-section"
       ref="registerSection"
-      openre="false"
-      :style="{ display }"
     >
       <img
         src="@/assets/close.png"
@@ -26,13 +24,15 @@
             <img src="@/assets/icon-01.png" alt class="icon-img" />
           </label>
           <input
-            type="text"
+            type="number"
             class="input"
-            name="phone"
+            name="mobile"
             placeholder="请输入手机号"
             id="phone"
             v-model="formData.mobile"
-            @blur="sendEvent('net_getRandomCode')"
+            @blur="mobileBulrCheck"
+            @change="validInput"
+            max="11"
           />
         </div>
         <div class="code-frame">
@@ -41,15 +41,22 @@
               <img src="@/assets/icon-02.png" alt class="icon-img" />
             </label>
             <input
-              type="text"
+              type="number"
               class="input"
               name="code"
               placeholder="请输随机码"
               id="code"
-              v-model="formData.random"
+              v-model="formData.code"
+              max="4"
+              @change="validInput"
             />
           </div>
-          <img :src="captchaUtl" alt="" class="code" />
+          <img
+            :src="captchaUtl"
+            alt=""
+            class="code"
+            @click="sendEvent('net_getRandomCode')"
+          />
         </div>
         <div class="captcha-frame">
           <div class="input-frame">
@@ -57,12 +64,14 @@
               <img src="@/assets/icon-02.png" alt class="icon-img" />
             </label>
             <input
-              type="text"
+              type="number"
               class="input"
-              name="captcha"
+              name="sms_code"
               placeholder="请输入手机验证码"
               id="captcha"
               v-model="formData.sms_code"
+              max="6"
+              @change="validInput"
             />
           </div>
           <img
@@ -74,7 +83,7 @@
           />
           <img
             src="@/assets/loading.gif"
-            v-show="SMSDisableBtn"
+            v-show="SMSLoading"
             class="time-loading"
           />
           <div v-show="showClock" class="time-clock">
@@ -92,6 +101,9 @@
             placeholder="请输密码"
             id="password"
             v-model="formData.password"
+            min="6"
+            max="32"
+            @change="validInput"
           />
         </div>
         <div class="input-frame">
@@ -101,14 +113,17 @@
           <input
             type="password"
             class="input"
-            name="password-again"
+            name="repassword"
             placeholder="请输密码"
             id="password-again"
             v-model="formData.repassword"
+            min="6"
+            max="32"
+            @change="validInput"
           />
         </div>
       </div>
-      <div class="recommend">推荐ID:3920392893</div>
+      <div class="recommend" v-if="channal">推荐ID : {{ channal }}</div>
 
       <div class="btn-frame">
         <img
@@ -131,7 +146,8 @@
 
 <script lang="ts">
 import { Component, Vue } from "vue-property-decorator";
-
+import formDataVO from "./formDataVO";
+import { validNumber } from "./utils";
 @Component
 export default class Register extends Vue {
   private display = "none";
@@ -141,21 +157,26 @@ export default class Register extends Vue {
   private TIME_LIMIT = 60;
   private timePassed = 0;
   private timeLeft = this.TIME_LIMIT || null;
+  private SMSLoading = false;
   private SMSDisableBtn = false;
   private RegisterDisableBtn = false;
 
+  private channalId = "";
+
   private showClock = false;
 
-  private formData = {
-    mobile: null,
-    random: null,
+  private formData: formDataVO = {
+    mobile: "",
+    code: "",
     // eslint-disable-next-line @typescript-eslint/camelcase
-    sms_code: null,
-    password: null,
-    repassword: null,
+    sms_code: "",
+    password: "",
+    repassword: "",
   };
 
   private registerElArr: HTMLElement[] = [];
+
+  private blurCheck = false;
 
   mounted() {
     window.addEventListener("message", this.getMessage, false);
@@ -173,16 +194,30 @@ export default class Register extends Vue {
     });
     this.registerElArr = [];
   }
-  closeRegister() {
+  private closeRegister() {
+    const elements = document.getElementsByTagName("body");
     this.display = "none";
+    if (elements) {
+      const element = elements.item(0) as HTMLElement;
+      element.style.overflowY = "auto";
+    }
   }
 
   private openRegister() {
+    const elements = document.getElementsByTagName("body");
     if (this.display == "none") {
       this.display = "flex";
+      if (elements) {
+        const element = elements.item(0) as HTMLElement;
+        element.style.overflowY = "hidden";
+      }
       this.init();
     } else {
       this.display = "none";
+      if (elements) {
+        const element = elements.item(0) as HTMLElement;
+        element.style.overflowY = "auto";
+      }
     }
   }
 
@@ -191,18 +226,19 @@ export default class Register extends Vue {
     this.TIME_LIMIT = 60;
     this.timePassed = 0;
     this.timeLeft = this.TIME_LIMIT || null;
+    this.SMSLoading = false;
     this.SMSDisableBtn = false;
     this.RegisterDisableBtn = false;
 
     this.showClock = false;
 
     this.formData = {
-      mobile: null,
-      random: null,
+      mobile: "",
+      code: "",
       // eslint-disable-next-line @typescript-eslint/camelcase
-      sms_code: null,
-      password: null,
-      repassword: null,
+      sms_code: "",
+      password: "",
+      repassword: "",
     };
     this.sendEvent("net_getRandomCode");
   }
@@ -221,15 +257,187 @@ export default class Register extends Vue {
   }
 
   private getSMSCode() {
-    if (!this.timePassed || this.SMSDisableBtn) {
-      this.sendEvent("net_getverification", {
-        mobile: this.formData.mobile,
-        random: this.formData.random,
-      });
-      this.timeLeft = null;
-      this.showClock = true;
-      this.SMSDisableBtn = true;
+    if (this.validSMSCode()) {
+      if (!this.showClock && !this.SMSLoading && !this.SMSDisableBtn) {
+        this.sendEvent("net_getverification", {
+          mobile: this.formData.mobile,
+          code: this.formData.code,
+        });
+        this.timeLeft = null;
+        this.showClock = true;
+        this.SMSDisableBtn = true;
+        this.SMSLoading = true;
+      }
     }
+  }
+
+  private verify(funName: string, funParam: any, val: string) {
+    switch (funName) {
+      case "notEmpty":
+        if (!val) {
+          // console.log("notEmpty");
+          return false;
+        }
+        break;
+
+      case "notNumber":
+        if (!validNumber(val)) {
+          // console.log("notNumber");
+          return false;
+        }
+        break;
+
+      case "lengthEqual":
+        if (val.length != Number(funParam)) {
+          // console.log("lengthEqual");
+          return false;
+        }
+        break;
+
+      case "equal":
+        if (val !== funParam) {
+          // console.log("equal");
+          return false;
+        }
+        break;
+
+      case "less":
+        if (val.length < Number(funParam)) {
+          // console.log("less");
+          return false;
+        }
+        break;
+
+      default:
+        break;
+    }
+    return true;
+  }
+
+  private validSMSCode(): boolean {
+    let validPass = true;
+    const checkList = {
+      mobile: {
+        notEmpty: true,
+        notNumber: true,
+        lengthEqual: 11,
+      },
+      code: {
+        notEmpty: true,
+        notNumber: true,
+        lengthEqual: 4,
+      },
+    };
+
+    Object.keys(checkList).map((key) => {
+      switch (key) {
+        case "mobile": {
+          const config = checkList.mobile;
+          const mobileArr = Object.keys(config);
+          for (let i = 0; i < mobileArr.length; i++) {
+            const valid = this.verify(
+              mobileArr[i],
+              checkList.mobile.lengthEqual,
+              this.formData.mobile
+            );
+            if (!valid) {
+              this.toggleTip("请正确输入手机号");
+              validPass = false;
+            }
+          }
+          break;
+        }
+
+        case "code": {
+          const arr = Object.keys(checkList.code);
+          for (let i = 0; i < arr.length; i++) {
+            const valid = this.verify(
+              arr[i],
+              checkList.code.lengthEqual,
+              this.formData.code
+            );
+            if (!valid) {
+              this.toggleTip("请正确输入4位随机码");
+              validPass = false;
+            }
+          }
+          break;
+        }
+      }
+    });
+    return validPass;
+  }
+
+  private validRegister(): boolean {
+    let validPass = true;
+    const checkList = {
+      sms_code: {
+        notEmpty: true,
+        notNumber: true,
+        less: 6,
+      },
+      password: {
+        notEmpty: true,
+        less: 6,
+      },
+      repassword: {
+        equal: this.formData.password,
+      },
+    };
+
+    Object.keys(checkList).map((key) => {
+      switch (key) {
+        case "sms_code": {
+          const config = checkList.sms_code;
+          const arr = Object.keys(config);
+          for (let i = 0; i < arr.length; i++) {
+            const valid = this.verify(
+              arr[i],
+              checkList.sms_code.less,
+              this.formData.sms_code
+            );
+            if (!valid) {
+              this.toggleTip("请输入6位有效手机验证码");
+              validPass = false;
+            }
+          }
+          break;
+        }
+
+        case "password": {
+          const arr = Object.keys(checkList.password);
+          for (let i = 0; i < arr.length; i++) {
+            const valid = this.verify(
+              arr[i],
+              checkList.password.less,
+              this.formData.password
+            );
+            if (!valid) {
+              this.toggleTip("密码至少6个以上的字符");
+              validPass = false;
+            }
+          }
+          break;
+        }
+
+        case "repassword": {
+          const arr = Object.keys(checkList.repassword);
+          for (let i = 0; i < arr.length; i++) {
+            const valid = this.verify(
+              arr[i],
+              checkList.repassword.equal,
+              this.formData.repassword
+            );
+            if (!valid) {
+              this.toggleTip("您两次输入的密码不一样");
+              validPass = false;
+            }
+          }
+          break;
+        }
+      }
+    });
+    return validPass;
   }
   // Timer
   private startTimer() {
@@ -261,19 +469,31 @@ export default class Register extends Vue {
   }
   // Timer End
 
+  private get channal() {
+    return this.channalId;
+  }
+
+  private set channal(id: string) {
+    this.channalId = id;
+  }
   private getMessage(e: any) {
     const getData = e.data;
     const getEvent = getData.event;
+    //console.log("event", getEvent, "getData", getData);
     const getParameter = getData.parameter;
     switch (getEvent) {
+      case "init_data":
+        if (getParameter.code) {
+          this.channal = getParameter.code;
+        }
+        break;
       case "net_getverification":
         //獲得驗證碼
-        this.startTimer();
+        this.SMSLoading = false;
         this.processCaptcha(getParameter);
 
         break;
       case "net_getRandomCode":
-        console.log("net_getRandomCode");
         this.setCaptcha(getParameter);
         //獲得隨機數
 
@@ -294,11 +514,25 @@ export default class Register extends Vue {
   }
 
   processCaptcha(res: any) {
-    this.toggleTip(res.message);
-    this.onTimesUp();
+    if (res.status_code != 200) {
+      // 失敗
+      this.toggleTip(res.message);
+      this.onTimesUp();
+    } else {
+      this.startTimer();
+    }
   }
   processRegister(res: any) {
-    this.toggleTip(res.message);
+    this.RegisterDisableBtn = false;
+    if (res.status_code != 200) {
+      this.toggleTip(res.message);
+    } else {
+      this.toggleTip("注册成功，前往下载");
+      setTimeout(() => {
+        this.closeRegister();
+        window.parent.postMessage("EVENT_APK_DOWNLOAD", "*");
+      }, 2000);
+    }
   }
 
   private tips = "";
@@ -313,33 +547,122 @@ export default class Register extends Vue {
   }
 
   private doRegister() {
-    this.sendEvent("net_register", this.formData);
-    this.RegisterDisableBtn = true;
+    if (this.validSMSCode() && this.validRegister()) {
+      const {
+        mobile,
+        // eslint-disable-next-line @typescript-eslint/camelcase
+        sms_code,
+        password,
+        repassword,
+      } = this.formData;
+      this.sendEvent("net_register", {
+        mobile,
+        // eslint-disable-next-line @typescript-eslint/camelcase
+        sms_code,
+        password,
+        repassword,
+      });
+      this.RegisterDisableBtn = true;
+    }
+  }
+
+  public validInput(event: { target: HTMLInputElement }) {
+    const { name, value, min, max } = event.target;
+    switch (name) {
+      case "mobile":
+        if (value.length <= Number(max)) {
+          this.formData.mobile = value;
+        } else {
+          this.formData.mobile = value.substr(0, Number(max));
+        }
+        break;
+      case "code":
+        if (value.length <= Number(max)) {
+          this.formData.code = value;
+        } else {
+          this.formData.code = value.substr(0, Number(max));
+        }
+        break;
+      case "sms_code":
+        if (value.length <= Number(max)) {
+          this.formData.sms_code = value;
+        } else {
+          this.formData.sms_code = value.substr(0, Number(max));
+        }
+        break;
+      case "password":
+        if (value.length <= Number(max)) {
+          this.formData.password = value;
+        } else {
+          this.formData.password = value.substr(0, Number(max));
+        }
+        break;
+
+      case "repassword":
+        if (value.length <= Number(max)) {
+          this.formData.repassword = value;
+        } else {
+          this.formData.repassword = value.substr(0, Number(max));
+        }
+        break;
+
+      default:
+        break;
+    }
+
+    this.$forceUpdate();
+  }
+
+  private mobileBulrCheck() {
+    if (!this.blurCheck) {
+      this.blurCheck = true;
+    } else {
+      this.sendEvent("net_getRandomCode");
+    }
   }
 }
 </script>
 
 <!-- Add "scoped" attribute to limit CSS to this component only -->
 <style scoped lang="scss">
+.bg {
+  position: fixed;
+  top: 0;
+  left: 0;
+  bottom: 0;
+  right: 0;
+  background: #000;
+  background: rgba(0, 0, 0, 0.85);
+  z-index: 19999;
+}
 #app-register {
   display: flex;
   width: 100%;
   justify-content: center;
+
   .btn-close {
     position: absolute;
     top: -0.5rem;
     right: -0.4rem;
   }
   .register-section {
-    position: absolute;
     z-index: 20000;
     background-color: #283447;
     border-radius: 0.2rem;
-    top: 6rem;
     border: 0.018rem solid #ae7542;
-    display: none;
     flex-direction: column;
     align-items: center;
+    display: table;
+    height: auto;
+    width: 80%;
+    margin: auto;
+    position: absolute;
+    top: 0;
+    left: 0;
+    bottom: 0;
+    right: 0;
+    text-align: center;
+    overflow: auto;
   }
 
   .form-frame {
@@ -389,8 +712,9 @@ export default class Register extends Vue {
     margin: 0 0.2rem;
     box-sizing: border-box;
     font-size: 0.8rem;
-    height: 1rem;
     min-width: 3.7rem;
+    width: 40%;
+    border-radius: 0.2rem;
   }
 
   .input-frame {
@@ -446,7 +770,6 @@ export default class Register extends Vue {
     background-color: #4d5f84;
     color: #fff;
     font-size: 0.5rem;
-    width: 80%;
     padding: 0.1rem;
     border-radius: 0.2rem;
     margin: 0.2rem;
