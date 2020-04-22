@@ -30,7 +30,7 @@
             placeholder="请输入手机号"
             id="phone"
             v-model="formData.mobile"
-            @blur="mobileBulrCheck"
+            @blur="mobileBlurCheck"
             @change="validInput"
             max="11"
           />
@@ -51,12 +51,7 @@
               @change="validInput"
             />
           </div>
-          <img
-            :src="captchaUtl"
-            alt=""
-            class="code"
-            @click="sendEvent('net_getRandomCode')"
-          />
+          <img :src="captchaUtl" alt="" class="code" @click="getRandomCode" />
         </div>
         <div class="captcha-frame">
           <div class="input-frame">
@@ -124,7 +119,6 @@
         </div>
       </div>
       <div class="recommend" v-if="channal">推荐ID : {{ channal }}</div>
-
       <div class="btn-frame">
         <img
           src="@/assets/loading.gif"
@@ -147,7 +141,8 @@
 <script lang="ts">
 import { Component, Vue } from "vue-property-decorator";
 import formDataVO from "./formDataVO";
-import { validNumber } from "./utils";
+import { sendEvent } from "./utils";
+import { validSMSCode, validRegister } from "./valid";
 @Component
 export default class Register extends Vue {
   private display = "none";
@@ -240,15 +235,7 @@ export default class Register extends Vue {
       password: "",
       repassword: "",
     };
-    this.sendEvent("net_getRandomCode");
-  }
-
-  private sendEvent(event: string, parameter?: any) {
-    const data = {
-      event,
-      parameter,
-    };
-    window.parent.postMessage(data, "*");
+    sendEvent("net_getRandomCode");
   }
 
   private setCaptcha(url: string) {
@@ -257,9 +244,9 @@ export default class Register extends Vue {
   }
 
   private getSMSCode() {
-    if (this.validSMSCode()) {
+    if (validSMSCode(this.formData, this.toggleTip)) {
       if (!this.showClock && !this.SMSLoading && !this.SMSDisableBtn) {
-        this.sendEvent("net_getverification", {
+        sendEvent("net_getverification", {
           mobile: this.formData.mobile,
           code: this.formData.code,
         });
@@ -269,175 +256,6 @@ export default class Register extends Vue {
         this.SMSLoading = true;
       }
     }
-  }
-
-  private verify(funName: string, funParam: any, val: string) {
-    switch (funName) {
-      case "notEmpty":
-        if (!val) {
-          // console.log("notEmpty");
-          return false;
-        }
-        break;
-
-      case "notNumber":
-        if (!validNumber(val)) {
-          // console.log("notNumber");
-          return false;
-        }
-        break;
-
-      case "lengthEqual":
-        if (val.length != Number(funParam)) {
-          // console.log("lengthEqual");
-          return false;
-        }
-        break;
-
-      case "equal":
-        if (val !== funParam) {
-          // console.log("equal");
-          return false;
-        }
-        break;
-
-      case "less":
-        if (val.length < Number(funParam)) {
-          // console.log("less");
-          return false;
-        }
-        break;
-
-      default:
-        break;
-    }
-    return true;
-  }
-
-  private validSMSCode(): boolean {
-    let validPass = true;
-    const checkList = {
-      mobile: {
-        notEmpty: true,
-        notNumber: true,
-        lengthEqual: 11,
-      },
-      code: {
-        notEmpty: true,
-        notNumber: true,
-        lengthEqual: 4,
-      },
-    };
-
-    Object.keys(checkList).map((key) => {
-      switch (key) {
-        case "mobile": {
-          const config = checkList.mobile;
-          const mobileArr = Object.keys(config);
-          for (let i = 0; i < mobileArr.length; i++) {
-            const valid = this.verify(
-              mobileArr[i],
-              checkList.mobile.lengthEqual,
-              this.formData.mobile
-            );
-            if (!valid) {
-              this.toggleTip("请正确输入手机号");
-              validPass = false;
-            }
-          }
-          break;
-        }
-
-        case "code": {
-          const arr = Object.keys(checkList.code);
-          for (let i = 0; i < arr.length; i++) {
-            const valid = this.verify(
-              arr[i],
-              checkList.code.lengthEqual,
-              this.formData.code
-            );
-            if (!valid) {
-              this.toggleTip("请正确输入4位随机码");
-              validPass = false;
-            }
-          }
-          break;
-        }
-      }
-    });
-    return validPass;
-  }
-
-  private validRegister(): boolean {
-    let validPass = true;
-    const checkList = {
-      sms_code: {
-        notEmpty: true,
-        notNumber: true,
-        less: 6,
-      },
-      password: {
-        notEmpty: true,
-        less: 6,
-      },
-      repassword: {
-        equal: this.formData.password,
-      },
-    };
-
-    Object.keys(checkList).map((key) => {
-      switch (key) {
-        case "sms_code": {
-          const config = checkList.sms_code;
-          const arr = Object.keys(config);
-          for (let i = 0; i < arr.length; i++) {
-            const valid = this.verify(
-              arr[i],
-              checkList.sms_code.less,
-              this.formData.sms_code
-            );
-            if (!valid) {
-              this.toggleTip("请输入6位有效手机验证码");
-              validPass = false;
-            }
-          }
-          break;
-        }
-
-        case "password": {
-          const arr = Object.keys(checkList.password);
-          for (let i = 0; i < arr.length; i++) {
-            const valid = this.verify(
-              arr[i],
-              checkList.password.less,
-              this.formData.password
-            );
-            if (!valid) {
-              this.toggleTip("密码至少6个以上的字符");
-              validPass = false;
-            }
-          }
-          break;
-        }
-
-        case "repassword": {
-          const arr = Object.keys(checkList.repassword);
-          for (let i = 0; i < arr.length; i++) {
-            const valid = this.verify(
-              arr[i],
-              checkList.repassword.equal,
-              this.formData.repassword
-            );
-            if (!valid) {
-              this.toggleTip("您两次输入的密码不一样");
-              validPass = false;
-            }
-          }
-          break;
-        }
-      }
-    });
-    return validPass;
   }
   // Timer
   private startTimer() {
@@ -476,6 +294,7 @@ export default class Register extends Vue {
   private set channal(id: string) {
     this.channalId = id;
   }
+
   private getMessage(e: any) {
     const getData = e.data;
     const getEvent = getData.event;
@@ -513,7 +332,7 @@ export default class Register extends Vue {
     }
   }
 
-  processCaptcha(res: any) {
+  private processCaptcha(res: any) {
     if (res.status_code != 200) {
       // 失敗
       this.toggleTip(res.message);
@@ -522,7 +341,8 @@ export default class Register extends Vue {
       this.startTimer();
     }
   }
-  processRegister(res: any) {
+
+  private processRegister(res: any) {
     this.RegisterDisableBtn = false;
     if (res.status_code != 200) {
       this.toggleTip(res.message);
@@ -537,7 +357,7 @@ export default class Register extends Vue {
 
   private tips = "";
   private openTips = false;
-  toggleTip(text: string) {
+  private toggleTip(text: string) {
     this.tips = "";
     this.tips = text;
     this.openTips = true;
@@ -547,7 +367,10 @@ export default class Register extends Vue {
   }
 
   private doRegister() {
-    if (this.validSMSCode() && this.validRegister()) {
+    if (
+      validSMSCode(this.formData, this.toggleTip) &&
+      validRegister(this.formData, this.toggleTip)
+    ) {
       const {
         mobile,
         // eslint-disable-next-line @typescript-eslint/camelcase
@@ -555,7 +378,7 @@ export default class Register extends Vue {
         password,
         repassword,
       } = this.formData;
-      this.sendEvent("net_register", {
+      sendEvent("net_register", {
         mobile,
         // eslint-disable-next-line @typescript-eslint/camelcase
         sms_code,
@@ -613,12 +436,15 @@ export default class Register extends Vue {
     this.$forceUpdate();
   }
 
-  private mobileBulrCheck() {
+  private mobileBlurCheck() {
     if (!this.blurCheck) {
       this.blurCheck = true;
     } else {
-      this.sendEvent("net_getRandomCode");
+      this.getRandomCode();
     }
+  }
+  private getRandomCode() {
+    sendEvent("net_getRandomCode");
   }
 }
 </script>
@@ -713,7 +539,6 @@ export default class Register extends Vue {
     box-sizing: border-box;
     font-size: 0.8rem;
     min-width: 3.7rem;
-    width: 40%;
     border-radius: 0.2rem;
   }
 
@@ -748,11 +573,13 @@ export default class Register extends Vue {
   .disable-btn {
     opacity: 0.3;
   }
+  .icon {
+    width: 0.78rem;
+  }
 
   .icon-img {
     width: auto;
     height: 0.7rem;
-    padding-right: 0.2rem;
   }
 
   .btn-register {
@@ -813,7 +640,7 @@ export default class Register extends Vue {
       position: absolute;
       width: 1rem;
       top: 0.4rem;
-      left: 2.2rem;
+      left: 4.4rem;
     }
   }
 
