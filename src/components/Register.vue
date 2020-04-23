@@ -29,9 +29,10 @@
             name="mobile"
             placeholder="请输入手机号"
             id="phone"
-            v-model="formData.mobile"
+            v-model.number="formData.mobile"
             @blur="mobileBlurCheck"
             @change="validInput"
+            @keyup="validInput"
             max="11"
           />
         </div>
@@ -46,9 +47,10 @@
               name="code"
               placeholder="请输随机码"
               id="code"
-              v-model="formData.code"
+              v-model.number="formData.code"
               max="4"
               @change="validInput"
+              @keyup="validInput"
             />
           </div>
           <img :src="captchaUtl" alt="" class="code" @click="getRandomCode" />
@@ -67,6 +69,7 @@
               v-model="formData.sms_code"
               max="6"
               @change="validInput"
+              @keyup="validInput"
             />
           </div>
           <img
@@ -99,6 +102,7 @@
             min="6"
             max="32"
             @change="validInput"
+            @keyup="validInput"
           />
         </div>
         <div class="input-frame">
@@ -115,6 +119,7 @@
             min="6"
             max="32"
             @change="validInput"
+            @keyup="validInput"
           />
         </div>
       </div>
@@ -143,6 +148,7 @@ import { Component, Vue } from "vue-property-decorator";
 import formDataVO from "./formDataVO";
 import { sendEvent } from "./utils";
 import { validSMSCode, validRegister } from "./valid";
+import { debounce } from "ts-debounce-throttle";
 @Component
 export default class Register extends Vue {
   private display = "none";
@@ -389,51 +395,32 @@ export default class Register extends Vue {
     }
   }
 
-  public validInput(event: { target: HTMLInputElement }) {
+  public validInput(event: { target: HTMLInputElement; type: string }) {
     const { name, value, min, max } = event.target;
-    switch (name) {
-      case "mobile":
-        if (value.length <= Number(max)) {
-          this.formData.mobile = value;
-        } else {
-          this.formData.mobile = value.substr(0, Number(max));
-        }
-        break;
-      case "code":
-        if (value.length <= Number(max)) {
-          this.formData.code = value;
-        } else {
-          this.formData.code = value.substr(0, Number(max));
-        }
-        break;
-      case "sms_code":
-        if (value.length <= Number(max)) {
-          this.formData.sms_code = value;
-        } else {
-          this.formData.sms_code = value.substr(0, Number(max));
-        }
-        break;
-      case "password":
-        if (value.length <= Number(max)) {
-          this.formData.password = value;
-        } else {
-          this.formData.password = value.substr(0, Number(max));
-        }
-        break;
+    if (event.type == "keyup" || event.type == "change") {
+      const inputVal = value.substr(0, Number(max));
+      switch (name) {
+        case "mobile":
+          this.formData.mobile = inputVal;
+          break;
+        case "code":
+          this.formData.code = inputVal;
+          break;
+        case "sms_code":
+          this.formData.sms_code = inputVal;
+          break;
+        case "password":
+          this.formData.password = inputVal;
+          break;
+        case "repassword":
+          this.formData.repassword = inputVal;
+          break;
 
-      case "repassword":
-        if (value.length <= Number(max)) {
-          this.formData.repassword = value;
-        } else {
-          this.formData.repassword = value.substr(0, Number(max));
-        }
-        break;
-
-      default:
-        break;
+        default:
+          break;
+      }
+      this.$forceUpdate();
     }
-
-    this.$forceUpdate();
   }
 
   private mobileBlurCheck() {
@@ -443,9 +430,7 @@ export default class Register extends Vue {
       this.getRandomCode();
     }
   }
-  private getRandomCode() {
-    sendEvent("net_getRandomCode");
-  }
+  private getRandomCode = debounce(() => sendEvent("net_getRandomCode"), 500);
 }
 </script>
 

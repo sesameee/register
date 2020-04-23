@@ -8261,6 +8261,11 @@ tryer@^1.0.1:
   resolved "https://registry.npm.taobao.org/tryer/download/tryer-1.0.1.tgz#f2c85406800b9b0f74c9f7465b81eaad241252f8"
   integrity sha1-8shUBoALmw90yfdGW4HqrSQSUvg=
 
+ts-debounce-throttle@^1.0.0:
+  version "1.0.0"
+  resolved "https://registry.yarnpkg.com/ts-debounce-throttle/-/ts-debounce-throttle-1.0.0.tgz#da0ceaf857b8878cb8fbee940054b2ff06ff2aa2"
+  integrity sha512-c1zNeawifC4TgB4xmHyHiUUag/Mc/27iag/iok4lBV2M3BCRF3KkzNSdqak1+uAJyLrGKJ1dMQ2TN5Pi+gyuqQ==
+
 ts-loader@^6.2.2:
   version "6.2.2"
   resolved "https://registry.npm.taobao.org/ts-loader/download/ts-loader-6.2.2.tgz#dffa3879b01a1a1e0a4b85e2b8421dc0dfff1c58"

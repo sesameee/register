@@ -1,7 +1,7 @@
 module.exports = {
   publicPath: "./",
-  //outputDir: "../static_landingpage/7_205/1",
-  outputDir: "dist",
+  outputDir: "../flooring_page_static/static_landingpage/7_205/2",
+  // outputDir: "dist",
   configureWebpack: {
     optimization: {
       splitChunks: false,
