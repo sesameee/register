@@ -1,11 +1,11 @@
 module.exports = {
   publicPath: "./",
-  outputDir: "../flooring_page_static/static_landingpage/7_205/2",
+  outputDir: "../flooring_page_static/static_landingpage/8_257/1",
   // outputDir: "dist",
   configureWebpack: {
     optimization: {
       splitChunks: false,
-    },
+    }
   },
   pages: {
     register: {
@@ -14,4 +14,14 @@ module.exports = {
       filename: "index.html",
     },
   },
+  css: {
+    sourceMap: false,
+    loaderOptions: {
+      scss: {
+        prependData: `
+        @import "~@/platform/8_257/template/main.scss";
+        `,
+      },
+    },
+  }
 };
