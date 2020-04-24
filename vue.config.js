@@ -1,6 +1,6 @@
 module.exports = {
   publicPath: "./",
-  outputDir: "../flooring_page_static/static_landingpage/8_257/1",
+  outputDir: "../flooring_page_static/static_landingpage/8_250/1",
   // outputDir: "dist",
   configureWebpack: {
     optimization: {
@@ -19,7 +19,7 @@ module.exports = {
     loaderOptions: {
       scss: {
         prependData: `
-        @import "~@/platform/8_257/template/main.scss";
+        @import "~@/platform/8_250/template/main.scss";
         `,
       },
     },

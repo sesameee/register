@@ -6,13 +6,9 @@
   >
     {{ tips }}
   </section>
-  <section
-    class="register-section"
-    id="register-section"
-    ref="registerSection"
-  >
+  <section class="register-section" id="register-section" ref="registerSection">
     <img
-      src="@/assets/close.png"
+      src="../register/close.png"
       alt
       class="btn-close"
       @click="closeRegister"
@@ -20,7 +16,7 @@
     <div class="form-frame">
       <div class="input-frame">
         <label for="phone" class="icon">
-          <img src="@/assets/icon-01.png" alt class="icon-img" />
+          <img src="../register/icon-01.png" alt class="icon-img" />
         </label>
         <input
           type="number"
@@ -38,7 +34,7 @@
       <div class="code-frame">
         <div class="input-frame">
           <label for="code" class="icon">
-            <img src="@/assets/icon-02.png" alt class="icon-img" />
+            <img src="../register/icon-02.png" alt class="icon-img" />
           </label>
           <input
             type="number"
@@ -57,7 +53,7 @@
       <div class="captcha-frame">
         <div class="input-frame">
           <label for="captcha" class="icon">
-            <img src="@/assets/icon-02.png" alt class="icon-img" />
+            <img src="../register/icon-02.png" alt class="icon-img" />
           </label>
           <input
             type="number"
@@ -72,7 +68,7 @@
           />
         </div>
         <img
-          src="@/assets/captchaBtn.png"
+          src="../register/captchaBtn.png"
           alt="captcha"
           class="captcha-btn"
           :class="{ ['disable-btn']: SMSDisableBtn }"
@@ -89,7 +85,7 @@
       </div>
       <div class="input-frame">
         <label for="password" class="icon">
-          <img src="@/assets/icon-03.png" alt class="icon-img" />
+          <img src="../register/icon-03.png" alt class="icon-img" />
         </label>
         <input
           type="password"
@@ -106,7 +102,7 @@
       </div>
       <div class="input-frame">
         <label for="password-again" class="icon">
-          <img src="@/assets/icon-03.png" alt class="icon-img" />
+          <img src="../register/icon-03.png" alt class="icon-img" />
         </label>
         <input
           type="password"
@@ -130,13 +126,13 @@
         class="loading"
       />
       <img
-        src="@/assets/quickRegisterBtn.png"
+        src="../register/quickRegisterBtn.png"
         alt
         class="btn-register"
         :class="{ ['disable-btn']: RegisterDisableBtn }"
         @click="doRegister()"
       />
     </div>
-    <img src="@/assets/loginWordBtn.png" alt class="btn-login down" />
+    <img src="../register/loginWordBtn.png" alt class="btn-login down" />
   </section>
 </div>
