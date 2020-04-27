@@ -1,4 +1,147 @@
-<template src="../platform/8_250/template/index.html"> </template>
+<template>
+  <div id="app-register" class="bg" :style="{ display }">
+    <section
+      class="tip"
+      id="tip"
+      :class="{ ['elementToFadeInAndOut']: openTips }"
+    >
+      {{ tips }}
+    </section>
+    <section
+      class="register-section"
+      id="register-section"
+      ref="registerSection"
+    >
+      <img
+        :src="getImage('close.png')"
+        alt
+        class="btn-close"
+        @click="closeRegister"
+      />
+      <div class="form-frame">
+        <div class="input-frame">
+          <label for="phone" class="icon">
+            <img :src="getImage('icon-01.png')" alt class="icon-img" />
+          </label>
+          <input
+            type="number"
+            class="input"
+            name="mobile"
+            placeholder="请输入手机号"
+            id="phone"
+            v-model.number="formData.mobile"
+            @blur="mobileBlurCheck"
+            @change="validInput"
+            @keyup="validInput"
+            max="11"
+          />
+        </div>
+        <div class="code-frame">
+          <div class="input-frame">
+            <label for="code" class="icon">
+              <img :src="getImage('icon-02.png')" alt class="icon-img" />
+            </label>
+            <input
+              type="number"
+              class="input"
+              name="code"
+              placeholder="请输随机码"
+              id="code"
+              v-model.number="formData.code"
+              max="4"
+              @change="validInput"
+              @keyup="validInput"
+            />
+          </div>
+          <img :src="captchaUtl" alt="" class="code" @click="getRandomCode" />
+        </div>
+        <div class="captcha-frame">
+          <div class="input-frame">
+            <label for="captcha" class="icon">
+              <img :src="getImage('icon-02.png')" alt class="icon-img" />
+            </label>
+            <input
+              type="number"
+              class="input"
+              name="sms_code"
+              placeholder="请输入手机验证码"
+              id="captcha"
+              v-model="formData.sms_code"
+              max="6"
+              @change="validInput"
+              @keyup="validInput"
+            />
+          </div>
+          <img
+            :src="getImage('captchaBtn.png')"
+            alt="captcha"
+            class="captcha-btn"
+            :class="{ ['disable-btn']: SMSDisableBtn }"
+            @click="getSMSCode"
+          />
+          <img
+            src="@/assets/loading.gif"
+            v-show="SMSLoading"
+            class="time-loading"
+          />
+          <div v-show="showClock" class="time-clock">
+            {{ formatTime(timeLeft) }}
+          </div>
+        </div>
+        <div class="input-frame">
+          <label for="password" class="icon">
+            <img :src="getImage('icon-03.png')" alt class="icon-img" />
+          </label>
+          <input
+            type="password"
+            class="input"
+            name="password"
+            placeholder="请输密码"
+            id="password"
+            v-model="formData.password"
+            min="6"
+            max="32"
+            @change="validInput"
+            @keyup="validInput"
+          />
+        </div>
+        <div class="input-frame">
+          <label for="password-again" class="icon">
+            <img :src="getImage('icon-03.png')" alt class="icon-img" />
+          </label>
+          <input
+            type="password"
+            class="input"
+            name="repassword"
+            placeholder="请输密码"
+            id="password-again"
+            v-model="formData.repassword"
+            min="6"
+            max="32"
+            @change="validInput"
+            @keyup="validInput"
+          />
+        </div>
+      </div>
+      <div class="recommend" v-if="channal">推荐ID : {{ channal }}</div>
+      <div class="btn-frame">
+        <img
+          src="@/assets/loading.gif"
+          v-show="RegisterDisableBtn"
+          class="loading"
+        />
+        <img
+          :src="getImage('quickRegisterBtn.png')"
+          alt
+          class="btn-register"
+          :class="{ ['disable-btn']: RegisterDisableBtn }"
+          @click="doRegister()"
+        />
+      </div>
+      <img :src="getImage('loginWordBtn.png')" alt class="btn-login down" />
+    </section>
+  </div>
+</template>
 
 <script lang="ts">
 import { Component, Vue } from "vue-property-decorator";
@@ -35,6 +178,10 @@ export default class Register extends Vue {
   private registerElArr: HTMLElement[] = [];
 
   private blurCheck = false;
+
+  getImage(path: string) {
+    return require(`../platform/${process.env.PLATFORM}/register/${path}`);
+  }
 
   mounted() {
     window.addEventListener("message", this.getMessage, false);
@@ -103,7 +250,7 @@ export default class Register extends Vue {
 
   private setCaptcha(url: string) {
     const timeInMs = Date.now();
-    this.captchaUtl = `${url}?time=${timeInMs}`;
+    this.captchaUtl = `${url}&time=${timeInMs}`;
   }
 
   private getSMSCode() {

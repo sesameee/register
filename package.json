@@ -6,9 +6,9 @@
     "serve": "vue-cli-service serve",
     "build": "vue-cli-service build",
     "lint": "vue-cli-service lint",
-    "7_205": "gulp --7_205 && vue-cli-service serve",
-    "8_250": "gulp --8_250 && vue-cli-service serve",
-    "8_257": "gulp --8_257 && vue-cli-service serve"
+    "7_205": "gulp --7_205 && vue-cli-service serve --platform=7_205",
+    "8_250": "gulp --8_250 && vue-cli-service serve --platform=8_250",
+    "8_257": "gulp --8_257 && vue-cli-service serve --platform=8_257"
   },
   "dependencies": {
     "core-js": "^3.6.4",
@@ -19,7 +19,8 @@
     "vue": "^2.6.11",
     "vue-class-component": "^7.2.3",
     "vue-property-decorator": "^8.4.1",
-    "write-file-webpack-plugin": "^4.5.1"
+    "write-file-webpack-plugin": "^4.5.1",
+    "yargs": "^15.3.1"
   },
   "devDependencies": {
     "@typescript-eslint/eslint-plugin": "^2.26.0",

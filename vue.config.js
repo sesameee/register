@@ -1,11 +1,19 @@
+// eslint-disable-next-line @typescript-eslint/no-var-requires
+const { argv } = require("yargs");
 module.exports = {
   publicPath: "./",
-  outputDir: "../flooring_page_static/static_landingpage/8_250/1",
+  outputDir: `../flooring_page_static/special_site/jstatic/${argv.platform}/1`,
   // outputDir: "dist",
   configureWebpack: {
     optimization: {
       splitChunks: false,
-    }
+    },
+  },
+  chainWebpack: (config) => {
+    config.plugin("define").tap((options) => {
+      options[0]["process.env"].PLATFORM = `"${argv.platform}"`;
+      return options;
+    });
   },
   pages: {
     register: {
@@ -19,9 +27,9 @@ module.exports = {
     loaderOptions: {
       scss: {
         prependData: `
-        @import "~@/platform/8_250/template/main.scss";
+        @import "~@/platform/${argv.platform}/template/main.scss";
         `,
       },
     },
-  }
+  },
 };
