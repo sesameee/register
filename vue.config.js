@@ -14,6 +14,14 @@ module.exports = {
       options[0]["process.env"].PLATFORM = `"${argv.platform}"`;
       return options;
     });
+    config.module
+      .rule("images")
+      .use("url-loader")
+      .loader("url-loader")
+      .tap((options) => {
+        options.limit = -1;
+        return options;
+      });
   },
   pages: {
     register: {
