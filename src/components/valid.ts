@@ -2,7 +2,8 @@ import { verify } from "./utils";
 import formDataVO from "./formDataVO";
 export const validSMSCode = (
   formData: formDataVO,
-  toggleTip: Function
+  toggleTip: Function,
+  isHaveRandCode: boolean
 ): boolean => {
   let validPass = true;
   const checkList = {
@@ -38,16 +39,18 @@ export const validSMSCode = (
       }
 
       case "code": {
-        const arr = Object.keys(checkList.code);
-        for (let i = 0; i < arr.length; i++) {
-          const valid = verify(
-            arr[i],
-            checkList.code.lengthEqual,
-            formData.code
-          );
-          if (!valid) {
-            toggleTip("请正确输入4位随机码");
-            validPass = false;
+        if (isHaveRandCode) {
+          const arr = Object.keys(checkList.code);
+          for (let i = 0; i < arr.length; i++) {
+            const valid = verify(
+              arr[i],
+              checkList.code.lengthEqual,
+              formData.code
+            );
+            if (!valid) {
+              toggleTip("请正确输入4位随机码");
+              validPass = false;
+            }
           }
         }
         break;
@@ -56,7 +59,6 @@ export const validSMSCode = (
   });
   return validPass;
 };
-
 
 export const validRegister = (
   formData: formDataVO,

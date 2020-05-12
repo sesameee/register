@@ -36,7 +36,7 @@
             max="11"
           />
         </div>
-        <div class="code-frame">
+        <div class="code-frame" v-if="isHaveRandCode">
           <div class="input-frame">
             <label for="code" class="icon">
               <img :src="getImage('icon-02.png')" alt class="icon-img" />
@@ -166,6 +166,8 @@ export default class Register extends Vue {
 
   private showClock = false;
 
+  private isHaveRandCode = false;
+
   private formData: formDataVO = {
     mobile: "",
     code: "",
@@ -254,11 +256,11 @@ export default class Register extends Vue {
   }
 
   private getSMSCode() {
-    if (validSMSCode(this.formData, this.toggleTip)) {
+    if (validSMSCode(this.formData, this.toggleTip, this.isHaveRandCode)) {
       if (!this.showClock && !this.SMSLoading && !this.SMSDisableBtn) {
         sendEvent("net_getverification", {
           mobile: this.formData.mobile,
-          code: this.formData.code,
+          code: this.formData.code || 0,
         });
         this.timeLeft = null;
         this.showClock = true;
@@ -314,6 +316,9 @@ export default class Register extends Vue {
       case "init_data":
         if (getParameter.code) {
           this.channal = getParameter.code;
+        }
+        if (getParameter.check_rand_code == "1") {
+          this.isHaveRandCode = true;
         }
         break;
       case "net_getverification":
@@ -378,7 +383,7 @@ export default class Register extends Vue {
 
   private doRegister() {
     if (
-      validSMSCode(this.formData, this.toggleTip) &&
+      validSMSCode(this.formData, this.toggleTip, this.isHaveRandCode) &&
       validRegister(this.formData, this.toggleTip)
     ) {
       const {

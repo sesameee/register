@@ -6,7 +6,7 @@
     "serve": "vue-cli-service serve",
     "build": "vue-cli-service build",
     "lint": "vue-cli-service lint",
-    "7_205": "gulp --7_205 && vue-cli-service serve --platform=7_205",
+    "8_250": "gulp --8_250 && vue-cli-service serve --platform=8_250",
     "7_227": "gulp --7_227 && vue-cli-service serve --platform=7_227",
     "b@7_227": "gulp --7_227 && vue-cli-service build --platform=7_227",
     "b@7_205": "gulp --7_205 && vue-cli-service build --platform=7_205",
