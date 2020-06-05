@@ -62,7 +62,8 @@ export const validSMSCode = (
 
 export const validRegister = (
   formData: formDataVO,
-  toggleTip: Function
+  toggleTip: Function,
+  isHaveSecondPassword: boolean
 ): boolean => {
   let validPass = true;
   const checkList = {
@@ -116,16 +117,18 @@ export const validRegister = (
       }
 
       case "repassword": {
-        const arr = Object.keys(checkList.repassword);
-        for (let i = 0; i < arr.length; i++) {
-          const valid = verify(
-            arr[i],
-            checkList.repassword.equal,
-            formData.repassword
-          );
-          if (!valid) {
-            toggleTip("您两次输入的密码不一样");
-            validPass = false;
+        if (isHaveSecondPassword) {
+          const arr = Object.keys(checkList.repassword);
+          for (let i = 0; i < arr.length; i++) {
+            const valid = verify(
+              arr[i],
+              checkList.repassword.equal,
+              formData.repassword
+            );
+            if (!valid) {
+              toggleTip("您两次输入的密码不一样");
+              validPass = false;
+            }
           }
         }
         break;

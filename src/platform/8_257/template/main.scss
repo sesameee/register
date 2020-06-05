@@ -78,10 +78,10 @@
       right: 1.8rem;
     }
     .captcha-frame > .input-frame {
-      width: 49%;
+      flex: 1;
     }
     .code-frame > .input-frame {
-      width: 49%;
+      flex: 1;
     }
     .code {
       margin: 0 0.2rem;
@@ -115,11 +115,9 @@
       outline: none;
     }
     .captcha-btn {
-      width: 3rem;
-      height: 100%;
-      padding: 0.2rem;
+      margin: 0 0.2rem;
       box-sizing: border-box;
-      flex-grow: 1;
+      min-width: 3.7rem;
     }
     .disable-btn {
       opacity: 0.3;

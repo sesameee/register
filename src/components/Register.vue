@@ -105,7 +105,7 @@
             @keyup="validInput"
           />
         </div>
-        <div class="input-frame">
+        <div class="input-frame" v-if="isHaveSecondPassword">
           <label for="password-again" class="icon">
             <img :src="getImage('icon-03.png')" alt class="icon-img" />
           </label>
@@ -167,6 +167,8 @@ export default class Register extends Vue {
   private showClock = false;
 
   private isHaveRandCode = false;
+
+  private isHaveSecondPassword = false;
 
   private formData: formDataVO = {
     mobile: "",
@@ -320,6 +322,9 @@ export default class Register extends Vue {
         if (getParameter.check_rand_code == "1") {
           this.isHaveRandCode = true;
         }
+        if (getParameter.check_password == "1") {
+          this.isHaveSecondPassword = true;
+        }
         break;
       case "net_getverification":
         //獲得驗證碼
@@ -384,21 +389,24 @@ export default class Register extends Vue {
   private doRegister() {
     if (
       validSMSCode(this.formData, this.toggleTip, this.isHaveRandCode) &&
-      validRegister(this.formData, this.toggleTip)
+      validRegister(this.formData, this.toggleTip, this.isHaveSecondPassword)
     ) {
       const {
         mobile,
         // eslint-disable-next-line @typescript-eslint/camelcase
         sms_code,
         password,
-        repassword,
       } = this.formData;
+      let { repassword } = this.formData;
+      if (!this.isHaveSecondPassword) {
+        repassword = password;
+      }
       sendEvent("net_register", {
         mobile,
         // eslint-disable-next-line @typescript-eslint/camelcase
         sms_code,
         password,
-        repassword,
+        repassword
       });
       this.RegisterDisableBtn = true;
     }
