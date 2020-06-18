@@ -170,6 +170,8 @@ export default class Register extends Vue {
 
   private isHaveSecondPassword = false;
 
+  private isUseBase64 = false;
+
   private formData: formDataVO = {
     mobile: "",
     code: "",
@@ -254,7 +256,7 @@ export default class Register extends Vue {
 
   private setCaptcha(url: string) {
     const timeInMs = Date.now();
-    this.captchaUtl = `${url}&time=${timeInMs}`;
+    this.captchaUtl = this.isUseBase64 ? url : `${url}&time=${timeInMs}`;
   }
 
   private getSMSCode() {
@@ -324,6 +326,10 @@ export default class Register extends Vue {
         }
         if (getParameter.check_password == "1") {
           this.isHaveSecondPassword = true;
+        }
+        if (getParameter.getRandomCodeBase64) {
+          this.isUseBase64 = true;
+          this.setCaptcha(String(getParameter.getRandomCodeBase64));
         }
         break;
       case "net_getverification":
@@ -406,7 +412,7 @@ export default class Register extends Vue {
         // eslint-disable-next-line @typescript-eslint/camelcase
         sms_code,
         password,
-        repassword
+        repassword,
       });
       this.RegisterDisableBtn = true;
     }
@@ -447,7 +453,13 @@ export default class Register extends Vue {
       this.getRandomCode();
     }
   }
-  private getRandomCode = debounce(() => sendEvent("net_getRandomCode"), 500);
+  private getRandomCode = debounce(
+    () =>
+      sendEvent(
+        this.isUseBase64 ? "EVENT_UPDATA_RANDCODE" : "net_getRandomCode"
+      ),
+    500
+  );
 }
 </script>
 
