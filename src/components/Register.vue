@@ -19,7 +19,7 @@
         @click="closeRegister"
       />
       <div class="form-frame">
-        <div class="input-frame">
+        <div class="input-frame" :style="frameStyle">
           <label for="phone" class="icon">
             <img :src="getImage('icon-01.png')" alt class="icon-img" />
           </label>
@@ -34,10 +34,11 @@
             @change="validInput"
             @keyup="validInput"
             max="11"
+            :style="inputStyle"
           />
         </div>
         <div class="code-frame" v-if="isHaveRandCode">
-          <div class="input-frame">
+          <div class="input-frame" :style="frameStyle">
             <label for="code" class="icon">
               <img :src="getImage('icon-02.png')" alt class="icon-img" />
             </label>
@@ -51,12 +52,13 @@
               max="4"
               @change="validInput"
               @keyup="validInput"
+              :style="inputStyle"
             />
           </div>
           <img :src="captchaUtl" alt="" class="code" @click="getRandomCode" />
         </div>
         <div class="captcha-frame">
-          <div class="input-frame">
+          <div class="input-frame" :style="frameStyle">
             <label for="captcha" class="icon">
               <img :src="getImage('icon-02.png')" alt class="icon-img" />
             </label>
@@ -70,6 +72,7 @@
               max="6"
               @change="validInput"
               @keyup="validInput"
+              :style="inputStyle"
             />
           </div>
           <img
@@ -88,7 +91,7 @@
             {{ formatTime(timeLeft) }}
           </div>
         </div>
-        <div class="input-frame">
+        <div class="input-frame" :style="frameStyle">
           <label for="password" class="icon">
             <img :src="getImage('icon-03.png')" alt class="icon-img" />
           </label>
@@ -103,9 +106,14 @@
             max="32"
             @change="validInput"
             @keyup="validInput"
+            :style="inputStyle"
           />
         </div>
-        <div class="input-frame" v-if="isHaveSecondPassword">
+        <div
+          class="input-frame"
+          :style="frameStyle"
+          v-if="isHaveSecondPassword"
+        >
           <label for="password-again" class="icon">
             <img :src="getImage('icon-03.png')" alt class="icon-img" />
           </label>
@@ -120,6 +128,7 @@
             max="32"
             @change="validInput"
             @keyup="validInput"
+            :style="inputStyle"
           />
         </div>
       </div>
@@ -185,6 +194,15 @@ export default class Register extends Vue {
 
   private blurCheck = false;
 
+  private frameStyle = {
+    opacity: "",
+    backgroundColor: "",
+  };
+
+  private inputStyle = {
+    color: "",
+  };
+
   getImage(path: string) {
     return require(`../platform/${process.env.PLATFORM}/register/${path}`);
   }
@@ -196,6 +214,17 @@ export default class Register extends Vue {
       const element = registerClass.item(index) as HTMLElement;
       this.registerElArr[index] = element;
       this.registerElArr[index].addEventListener("click", this.openRegister);
+    }
+
+    const registerInputStyle = document.getElementById("registerInputStyle");
+    if (registerInputStyle) {
+      this.frameStyle = {
+        opacity: registerInputStyle.getAttribute("bgopacity") || "",
+        backgroundColor: registerInputStyle.getAttribute("bgcolor") || "",
+      };
+      this.inputStyle = {
+        color: registerInputStyle.getAttribute("textcolor") || "",
+      };
     }
   }
   destroyed() {
@@ -327,9 +356,8 @@ export default class Register extends Vue {
         if (getParameter.check_password == "1") {
           this.isHaveSecondPassword = true;
         }
-        if (getParameter.getRandomCodeBase64) {
+        if (getParameter.getRandomCodeBase64 == "1") {
           this.isUseBase64 = true;
-          this.setCaptcha(String(getParameter.getRandomCodeBase64));
         }
         break;
       case "net_getverification":
