@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+    <title>欢迎莅临</title>
+    <meta name="keywords" content="" />
+    <meta name="description" content="" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1, user-scalable=0, maximum-scale=1, minimum-scale=1"
+    />
+    <meta content="yes" name="apple-mobile-web-app-capable" />
+    <meta content="black" name="apple-mobile-web-app-status-bar-style" />
+    <meta name="format-detection" content="telephone=no" />
+    <link rel="stylesheet" type="text/css" href="./static/main.css" />
+    <script src="./static/jquery.js" type="text/javascript"></script>
+    <script type="text/javascript">
+      var scale = Math.min(window.screen.width / 750, 1);
+      var viewport =
+        '<meta name="viewport" content="width=device-width, initial-scale=' +
+        scale +
+        ", maximum-scale=" +
+        scale +
+        ", minimum-scale=" +
+        scale +
+        ', user-scalable=yes" />';
+      document.write(viewport);
+    </script>
+    <style>
+      html {
+        overflow-y: auto;
+        -webkit-overflow-scrolling: touch;
+      }
+
+      body {
+        overflow-y: auto;
+        -webkit-overflow-scrolling: touch;
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+      }
+    </style>
+  </head>
+  <body style="overflow-x: hidden;">
+    <noscript>
+      <strong
+        >We're sorry but <%= htmlWebpackPlugin.options.title %> doesn't work
+        properly without JavaScript enabled. Please enable it to
+        continue.</strong
+      >
+    </noscript>
+
+    <section class="section">
+      <div id="register_here"></div>
+      <div class="first-page">
+        <div class="top-btn-frame">
+          <img class="top-img register" src=./static/img/topDownloadBtn.png>
+        </div>
+        <div class="middle-btn-frame">
+          <img class="middle-img register"
+          src=./static/img/middleDownloadBtn.png>
+        </div>
+        <img class="img" src="./static/img/bg_01.jpg?v=3" />
+      </div>
+      <img class="img down" src=./static/img/bg_02.jpg>
+    </section>
+
+    <script>
+      $(function() {
+        $(".down").click(function() {
+          window.parent.postMessage("EVENT_APK_DOWNLOAD", "*");
+        });
+        //客服下载
+        document.getElementById("customerService").onclick = function() {
+          window.parent.postMessage("EVENT_CUSTOMER_SERVICE", "*");
+        };
+      });
+      window.addEventListener(
+        "message",
+        function(e) {
+          console.log(e.data);
+
+          if (e.data.event == "COLLECT_IOSURL_TIP") {
+            //IOS收藏页面引导
+            document.querySelector("div.guid.max_width").style.display =
+              "block";
+          } else if (e.data.event == "PROHIBITORY_DOWNLOAD_TIP") {
+            //禁止下载，并且点击以后可以复制地址
+            document.querySelector("div.not_down_body").style.display = "block";
+          }
+        },
+        false
+      );
+
+      //去下载
+      function downLoad() {
+        window.parent.postMessage("EVENT_APK_DOWNLOAD", "*");
+      }
+
+      //复制地址
+      function copyURL() {
+        window.parent.postMessage("EVENT_COPY_URL", "*");
+      }
+
+      //关闭收藏页面
+      function closeiosmobilecollecturlguid() {
+        document.querySelector("div.guid.max_width").style.display = "none";
+      }
+    </script>
+    <!-- <a id="registerInputStyle" textcolor="#a28243" bgcolor="#2c1f17" bgopacity="0.99" style="display: none;" ></a> -->
+    <!-- built files will be auto injected -->
+  </body>
+</html>

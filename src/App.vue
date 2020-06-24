@@ -4,7 +4,7 @@
 
 <script lang="ts">
 import { Component, Vue } from "vue-property-decorator";
-import Register from "./components/Register.vue";
+import Register from "./components/Register_s1.vue";
 
 @Component({
   components: {
