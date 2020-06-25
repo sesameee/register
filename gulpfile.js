@@ -2,6 +2,7 @@
 const gulp = require("gulp");
 
 gulp.task("static", function() {
+  //return gulp.src("immutable_s1/**").pipe(gulp.dest("public"));
   return gulp.src("immutable/**").pipe(gulp.dest("public"));
 });
 

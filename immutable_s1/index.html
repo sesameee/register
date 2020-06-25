@@ -51,22 +51,26 @@
         continue.</strong
       >
     </noscript>
-
     <section class="section">
-      <div id="register_here"></div>
-      <div class="first-page">
-        <div class="top-btn-frame">
-          <img class="top-img register" src=./static/img/topDownloadBtn.png>
+      <div class="content bg-black">
+        <div class="rg-box">
+          <div class="feedback-btn" id="popActive"></div>
+          <div class="title">
+            <div class="reg-logo"></div>
+            <div class="reg-company reg-font" id="company">大财神</div>
+            <div class="reg-name reg-font">用户注册</div>
+          </div>
+          <div id="register_here"></div>
+          <div class="tips">
+            已有账号的玩家
+            <span class="link down" id="tipJump">请点这里</span>
+          </div>
         </div>
-        <div class="middle-btn-frame">
-          <img class="middle-img register"
-          src=./static/img/middleDownloadBtn.png>
-        </div>
-        <img class="img" src="./static/img/bg_01.jpg?v=3" />
       </div>
-      <img class="img down" src=./static/img/bg_02.jpg>
+      <div id="shadow" class="set hide">
+        <img id="shadowImg" src="./img/pub/bigshare1.png" />
+      </div>
     </section>
-
     <script>
       $(function() {
         $(".down").click(function() {

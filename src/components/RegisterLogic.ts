@@ -20,12 +20,14 @@ export default class RegisterLogic extends Vue {
   private channalId = "";
 
   private showClock = false;
-
+  //需不需要隨機碼
   private isHaveRandCode = false;
-
+  //需不需要二次驗證密碼
   private isHaveSecondPassword = false;
-
+  //使用base64驗證碼圖片
   private isUseBase64 = false;
+  //需不需要註冊
+  private isNeedRegister = true;
 
   private formData: formDataVO = {
     mobile: "",
@@ -56,10 +58,11 @@ export default class RegisterLogic extends Vue {
   mounted() {
     window.addEventListener("message", this.getMessage, false);
     const registerClass = document.getElementsByClassName("register");
+
     for (let index = 0; index < registerClass.length; index++) {
       const element = registerClass.item(index) as HTMLElement;
       this.registerElArr[index] = element;
-      this.registerElArr[index].addEventListener("click", this.openRegister);
+      this.registerElArr[index].addEventListener("click", this.clickStartBtn);
     }
 
     const registerInputStyle = document.getElementById("registerInputStyle");
@@ -76,10 +79,14 @@ export default class RegisterLogic extends Vue {
   destroyed() {
     window.removeEventListener("message", this.getMessage, false);
     this.registerElArr.map((element: HTMLElement) => {
-      element.removeEventListener("click", this.openRegister);
+      element.removeEventListener("click", this.clickStartBtn);
     });
     this.registerElArr = [];
   }
+  private clickStartBtn() {
+    return this.isNeedRegister ? this.openRegister() : this.doDownload();
+  }
+
   private closeRegister() {
     const elements = document.getElementsByTagName("body");
     this.display = "none";
@@ -196,14 +203,17 @@ export default class RegisterLogic extends Vue {
         if (getParameter.code) {
           this.channal = getParameter.code;
         }
-        if (getParameter.check_rand_code == "1") {
+        if (String(getParameter.check_rand_code) == "1") {
           this.isHaveRandCode = true;
         }
-        if (getParameter.check_password == "1") {
+        if (String(getParameter.check_password) == "1") {
           this.isHaveSecondPassword = true;
         }
-        if (getParameter.getRandomCodeBase64 == "1") {
+        if (String(getParameter.getRandomCodeBase64) == "1") {
           this.isUseBase64 = true;
+        }
+        if (String(getParameter.web_register) == "0") {
+          this.isNeedRegister = false;
         }
         break;
       case "net_getverification":
@@ -241,7 +251,10 @@ export default class RegisterLogic extends Vue {
       this.startTimer();
     }
   }
-
+  private doDownload(): void {
+    console.log('doDownload');
+    window.parent.postMessage("EVENT_APK_DOWNLOAD", "*");
+  }
   private processRegister(res: any) {
     this.RegisterDisableBtn = false;
     if (res.status_code != 200) {
@@ -250,7 +263,7 @@ export default class RegisterLogic extends Vue {
       this.toggleTip("注册成功，前往下载");
       setTimeout(() => {
         this.closeRegister();
-        window.parent.postMessage("EVENT_APK_DOWNLOAD", "*");
+        this.doDownload();
       }, 2000);
     }
   }
