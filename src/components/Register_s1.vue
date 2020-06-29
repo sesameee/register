@@ -28,6 +28,21 @@
           :style="inputStyle"
         />
       </div>
+      <div class="input-row" v-if="isHaveRandCode">
+        <input
+          type="number"
+          class="numbox-input authCode"
+          name="code"
+          placeholder="请输随机码"
+          id="code"
+          v-model.number="formData.code"
+          max="4"
+          @change="validInput"
+          @keyup="validInput"
+          :style="inputStyle"
+        />
+        <img :src="captchaUtl" alt="" class="code" @click="getRandomCode" />
+      </div>
       <div class="input-row">
         <input
           type="number"
@@ -45,13 +60,40 @@
           type="button"
           class="check-btn"
           id="authCodeBtn"
-          @click="getRandomCode"
+          @click="getSMSCode"
         >
           获取验证码
         </button>
-        <span class="check-btn check-btn-wait hide" id="authWait"
-          >重新发送</span
-        >
+      </div>
+
+      <div class="input-row">
+        <input
+          class="numbox-input password"
+          name="password"
+          placeholder="请输密码"
+          id="password"
+          v-model="formData.password"
+          min="6"
+          max="32"
+          @change="validInput"
+          @keyup="validInput"
+          :style="inputStyle"
+        />
+      </div>
+
+      <div class="input-row" v-if="isHaveSecondPassword">
+        <input
+          class="numbox-input password"
+          name="repassword"
+          placeholder="请输密码"
+          id="password-again"
+          v-model="formData.repassword"
+          min="6"
+          max="32"
+          @change="validInput"
+          @keyup="validInput"
+          :style="inputStyle"
+        />
       </div>
       <div class="input-row" v-if="channal">
         <input
@@ -60,7 +102,7 @@
           class="numbox-input invite_code"
           placeholder="渠道码"
           id="invite_code"
-          :value="channal"
+          :value="`渠道码${channal}`"
         />
       </div>
       <div class="input-row">

@@ -1,3 +1,39 @@
+@mixin for-landscape {
+  @media screen and (orientation: landscape) {
+    @content;
+  }
+}
+
+@mixin for-portrait {
+  @media screen and (orientation: portrait) {
+    @content;
+  }
+}
+
+@mixin for-ipad-only {
+  @media only screen and (min-device-width: 768px) and (max-device-width: 1024px) and (orientation: portrait) and (-webkit-min-device-pixel-ratio: 1) {
+    @content;
+  }
+  @media only screen and (min-width: 1024px) and (max-height: 1366px) and (orientation: portrait) and (-webkit-min-device-pixel-ratio: 1.5) {
+    @content;
+  }
+}
+
+@mixin for-desktop {
+  /* ----------- Non-Retina Screens ----------- */
+  @media (min-width: 1281px) {
+    @content;
+  }
+}
+
+html {
+  @include for-desktop {
+    font-size: 36px;
+  }
+  @include for-ipad-only {
+    font-size: 50px;
+  }
+}
 .bg {
   position: fixed;
   top: 0;
@@ -72,26 +108,6 @@
     border-radius: 0.2rem;
   }
 
-  // .input-frame {
-  //   display: flex;
-  //   align-items: center;
-  //   margin: 0.2rem;
-  //   background-color: #2f286b;
-  //   padding: 0.2rem;
-  //   height: 0.7rem;
-  //   border-radius: 0.2rem;
-  //   color: #fff;
-  // }
-
-  // .input-frame > .input {
-  //   color: #fff;
-  //   background-color: transparent;
-  //   border: 0;
-  //   font-size: 0.5rem;
-  //   flex: 1;
-  //   -webkit-appearance: none;
-  //   width: 100%;
-  // }
   .input-frame > .input:focus {
     outline: none;
   }
@@ -182,7 +198,7 @@
 }
 
 .reg-font {
-  font: 700 8vw "Comic Sans MS";
+  font: 700 1rem "Comic Sans MS";
   background: linear-gradient(
     to bottom,
     #ffe3be,
@@ -207,36 +223,38 @@
   display: none;
   position: absolute;
   text-align: right;
-  right: 4vw;
-  top: 4vw;
-  width: 13vw;
-  height: 13vw;
+  right: 0.2rem;
+  top: 0.2rem;
+  width: 1.65rem;
+  height: 1.65rem;
   background: url("~@/platform/sp1/register/btn_1.png") center center no-repeat;
   background-size: auto 100%;
 }
 
 .title {
   text-align: center;
-  margin-top: 25vw;
+  margin-top: 3rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
 }
 
 .reg-logo {
   left: 50%;
-  margin-left: 20vw;
-  width: 30vw;
-  height: 22vw;
+  width: 4.2rem;
+  height: 3rem;
   background: url("~@/platform/sp1/register/png_t.png") center center no-repeat;
   background-size: auto 100%;
 }
 
 .reg-company {
-  font-size: 7vw;
-  height: 10vw;
+  font-size: 0.9rem;
+  height: 1.3rem;
 }
 
 .reg-name {
-  font-size: 10vw;
-  margin-top: 4vw;
+  font-size: 1.3rem;
+  margin-top: 0.2rem;
 }
 
 .reg-form {
@@ -244,46 +262,51 @@
   padding: 0;
   border: 0;
   background-color: transparent;
-  margin-top: 4vw;
+  margin-top: 0.3rem;
   text-align: center;
 }
 
 .input-row {
-  position: relative;
-  height: 13vw;
-  margin-top: 0.7vw;
-  clear: left;
-  overflow: hidden;
+  display: flex;
+  padding: 0.1rem;
+  margin: 0.1rem;
+  height: 1.3rem;
+  justify-content: space-between;
 }
 
 .input-row .numbox-input {
   width: 100%;
-  height: 10vw;
+  // height: 10vw;
   border-radius: 5px;
-  padding-left: 12vw;
-  font-size: 4vw;
+  padding-left: 1.4rem;
+  font-size: 0.5rem;
   color: #656571;
   text-align: left;
 }
 
 .input-row .mobile {
-  background: #fff url("~@/platform/sp1/register/p_3.png") no-repeat 3vw center;
-  background-size: 4.5vw;
-  float: left;
+  background: #fff url("~@/platform/sp1/register/p_3.png") no-repeat 0.45rem center;
+  background-size: 0.5rem;
+  
 }
 
 .input-row .authCode {
-  background: #fff url("~@/platform/sp1/register/p_4.png") no-repeat 3vw center;
-  background-size: 4.5vw;
+  background: #fff url("~@/platform/sp1/register/p_4.png") no-repeat 0.45rem center;
+  background-size: 0.5rem;
   width: 60%;
-  float: left;
+  
+}
+
+.input-row .password {
+  background: #fff url("~@/platform/sp1/register/p_4.png") no-repeat 0.45rem center;
+  background-size: 0.5rem;
+  
 }
 
 .input-row .invite_code {
   color: #ccc;
   padding: 0;
   text-align: center;
-  float: left;
 }
 
 .check-btn {
@@ -292,17 +315,14 @@
   color: #1a1a1a;
   background: #e3d7c9;
   border-radius: 5px;
-  line-height: 10vw;
-  height: 10vw;
-  font-size: 3.5vw;
-  float: right;
+  font-size: 0.4rem;
   font-weight: bold;
 }
 
 .check-btn-wait {
   color: #e4d6c7;
   background: #60584f;
-  font-size: 3.5vw;
+  font-size: 0.4rem;
 }
 
 .reg-btn {
@@ -311,16 +331,14 @@
   color: #fff;
   background: #ab8256;
   border-radius: 5px;
-  line-height: 10vw;
-  height: 10vw;
-  font-size: 4vw;
+  font-size: 0.45rem;
   float: left;
   font-weight: bold;
 }
 
 .tips {
   color: #fff;
-  font-size: 4vw;
+  font-size: 0.45rem;
 }
 
 .tips .link {

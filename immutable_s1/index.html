@@ -77,9 +77,11 @@
           window.parent.postMessage("EVENT_APK_DOWNLOAD", "*");
         });
         //客服下载
-        document.getElementById("customerService").onclick = function() {
-          window.parent.postMessage("EVENT_CUSTOMER_SERVICE", "*");
-        };
+        if (document.getElementById("customerService")) {
+          document.getElementById("customerService").onclick = function() {
+            window.parent.postMessage("EVENT_CUSTOMER_SERVICE", "*");
+          };
+        }
       });
       window.addEventListener(
         "message",
