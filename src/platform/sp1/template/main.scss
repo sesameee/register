@@ -92,7 +92,7 @@ html {
     display: block;
     color: #fff;
     position: absolute;
-    right: 1.8rem;
+    right: 1.2rem;
   }
   .captcha-frame > .input-frame {
     flex: 1;
@@ -101,7 +101,7 @@ html {
     flex: 1;
   }
   .code {
-    margin: 0 0.2rem;
+    width: 37%;
     box-sizing: border-box;
     font-size: 0.8rem;
     min-width: 3.7rem;
@@ -193,7 +193,7 @@ html {
   .time-loading {
     position: absolute;
     width: 1rem;
-    right: 2rem;
+    right: 1.3rem;
   }
 }
 
@@ -272,6 +272,7 @@ html {
   margin: 0.1rem;
   height: 1.3rem;
   justify-content: space-between;
+  position: relative;
 }
 
 .input-row .numbox-input {
@@ -310,7 +311,7 @@ html {
 }
 
 .check-btn {
-  width: 35%;
+  width: 37%;
   padding: 0;
   color: #1a1a1a;
   background: #e3d7c9;

@@ -59,11 +59,20 @@
         <button
           type="button"
           class="check-btn"
+          :class="{ ['disable-btn']: SMSDisableBtn }"
           id="authCodeBtn"
           @click="getSMSCode"
         >
           获取验证码
         </button>
+        <img
+          src="@/assets/loading.gif"
+          v-show="SMSLoading"
+          class="time-loading"
+        />
+        <div v-show="showClock" class="time-clock">
+          {{ formatTime(timeLeft) }}
+        </div>
       </div>
 
       <div class="input-row">
