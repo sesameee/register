@@ -2,8 +2,8 @@
 const { argv } = require("yargs");
 module.exports = {
   publicPath: "./",
-  // outputDir: `../flooring_page_static/special_site/jstatic/${argv.platform}/1`,
-  outputDir: `../flooring_page_static/special_site/242/1589660242`,
+  outputDir: `../flooring_page_static/special_site/jstatic/${argv.platform}/1`,
+  //outputDir: `../flooring_page_static/special_site/242/1589660242`,
   // outputDir: "dist",
   configureWebpack: {
     optimization: {
