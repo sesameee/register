@@ -245,11 +245,11 @@ export default class RegisterLogic extends Vue {
   private processCaptcha(res: any) {
     if (res.status_code != 200) {
       // 失敗
-      this.toggleTip(res.message);
       this.onTimesUp();
     } else {
       this.startTimer();
     }
+    this.toggleTip(res.message);
   }
   private doDownload(): void {
     console.log('doDownload');
